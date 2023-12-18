@@ -29,4 +29,13 @@ public class CustomerRepository implements ICustomerRepository {
         }
         return customerEntity.get().toCustomer();
     }
+
+    @Override
+    public Customer findByEmail(String email) {
+        Optional<CustomerEntity> customerEntity = this.customerRepository.findByEmail(email);
+        if(customerEntity.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer doesn´t exist");
+        }
+        return customerEntity.get().toCustomer();
+    }
 }

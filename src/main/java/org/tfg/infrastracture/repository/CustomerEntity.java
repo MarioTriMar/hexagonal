@@ -2,7 +2,6 @@ package org.tfg.infrastracture.repository;
 
 import jakarta.persistence.*;
 import org.tfg.domain.model.Customer;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Serializable;

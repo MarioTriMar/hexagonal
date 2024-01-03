@@ -2,6 +2,7 @@ package org.tfg.domain.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -21,6 +22,9 @@ public class CustomerService implements ICustomerService {
 
     @Autowired
     private ICustomerRepository customerRepository;
+
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
 
     @Override
     public void register(String name, String email, String pass1, String pass2, MultipartFile image) {
@@ -42,7 +46,6 @@ public class CustomerService implements ICustomerService {
         }catch (IOException e){
             throw new RuntimeException("Error al procesar imagen");
         }
-
     }
 
     @Override
@@ -81,8 +84,10 @@ public class CustomerService implements ICustomerService {
     }
 
     @Override
-    @Cacheable(cacheNames = "customers", key="#id")
     public Customer getCustomerById(String id) {
-        return this.customerRepository.findById(id);
+
+        Customer customer = this.customerRepository.findById(id);
+        redisTemplate.opsForValue().set(customer.getId(), customer);
+        return customer;
     }
 }

@@ -28,7 +28,7 @@ public class CarService implements ICarService{
         car.setName(name);
         this.carRepository.save(car);
     }
-
+    /*
     @Override
     public Car findById(String id) throws JsonProcessingException {
         String key="car::"+id;
@@ -42,6 +42,12 @@ public class CarService implements ICarService{
             return objectMapper.readValue(carRedis, new TypeReference<Car>(){});
         }
 
+    */
 
+    @Override
+    @Cacheable(cacheNames = "car", key = "#id")
+    public Car findById(String id) throws JsonProcessingException {
+        return this.carRepository.findById(id);
     }
 }
+

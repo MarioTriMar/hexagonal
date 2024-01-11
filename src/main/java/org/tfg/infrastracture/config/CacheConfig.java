@@ -14,10 +14,11 @@ import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceClientConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
-import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
-import org.springframework.data.redis.serializer.RedisSerializationContext;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
+import org.springframework.data.redis.serializer.*;
+import org.tfg.application.Receiver;
 import org.tfg.domain.model.Car;
 import org.tfg.domain.model.Customer;
 import org.tfg.infrastracture.repository.CustomerEntity;
@@ -69,6 +70,32 @@ public class CacheConfig {
                 .withCacheConfiguration("car",
                         RedisCacheConfiguration.defaultCacheConfig().serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer((new Jackson2JsonRedisSerializer<Car>(Car.class)))))
                 .build();
+    }
+
+    @Bean
+    public ChannelTopic topic(){
+        return new ChannelTopic("pubsub");
+    }
+
+    @Bean
+    public MessageListenerAdapter messageListenerAdapter(){
+        return new MessageListenerAdapter(new Receiver());
+    }
+
+    @Bean
+    public RedisMessageListenerContainer redisMessageListenerContainer(){
+        RedisMessageListenerContainer container=new RedisMessageListenerContainer();
+        container.setConnectionFactory(redisConnectionFactory(redisConfiguration()));
+        container.addMessageListener(messageListenerAdapter(),topic());
+        return container;
+    }
+    @Bean
+    public RedisTemplate<String, Object> redisTemplate(){
+        RedisTemplate<String, Object> template = new RedisTemplate<>();
+        template.setConnectionFactory(redisConnectionFactory(redisConfiguration()));
+        template.setKeySerializer(new JdkSerializationRedisSerializer());
+        template.setValueSerializer(new GenericToStringSerializer<Object>(Object.class));
+        return template;
     }
 }
 

@@ -2,6 +2,7 @@ package org.tfg.application;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.tfg.domain.model.Car;
 import org.tfg.domain.service.ICarService;
@@ -14,8 +15,13 @@ public class CarController {
     @Autowired
     private ICarService carService;
 
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
+
     @GetMapping("/getCarById/{id}")
     public Car getCarById(@PathVariable String id) throws JsonProcessingException {
+        String message="Hola/ "+id;
+        redisTemplate.convertAndSend("pubsub", message);
         return this.carService.findById(id);
     }
 

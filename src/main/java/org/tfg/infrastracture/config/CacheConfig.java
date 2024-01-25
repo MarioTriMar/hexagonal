@@ -31,37 +31,19 @@ import java.util.List;
 @EnableCaching
 public class CacheConfig {
 
-    @Value("${redis.nodes}")
-    private String[] redisNodes;
+    @Value("${spring.redis.host}")
+    private String host;
     @Value("${spring.redis.port}")
     private Integer port;
 
     @Bean
-    LettuceConnectionFactory redisConnectionFactory(RedisClusterConfiguration redisConfiguration) {
-        LettuceClientConfiguration clientConfig = LettuceClientConfiguration.builder()
-                .readFrom(ReadFrom.REPLICA_PREFERRED)
-                .commandTimeout(Duration.ofSeconds(120))
-                .build();
-        return new LettuceConnectionFactory(redisConfiguration, clientConfig);
-    }
-    @Bean
-    RedisClusterConfiguration redisConfiguration() {
-        List<String> clusterNodes = Arrays.asList(redisNodes);
-        RedisClusterConfiguration redisClusterConfiguration = new RedisClusterConfiguration(clusterNodes);
-        redisClusterConfiguration.setMaxRedirects(5);
-        return redisClusterConfiguration;
-    }
-    @Bean
-    public RedisTemplate<String, Object> template(RedisConnectionFactory connectionFactory) {
-        RedisTemplate<String, Object> template = new RedisTemplate<>();
-        template.setConnectionFactory(connectionFactory);
-        template.setKeySerializer(new StringRedisSerializer());
-        template.setHashKeySerializer(new StringRedisSerializer());
-        template.setHashKeySerializer(new JdkSerializationRedisSerializer());
-        template.setValueSerializer(new JdkSerializationRedisSerializer());
-        template.setEnableTransactionSupport(true);
-        template.afterPropertiesSet();
-        return template;
+    public LettuceConnectionFactory connectionFactory(){
+        RedisStandaloneConfiguration configuration = new RedisStandaloneConfiguration();
+        configuration.setHostName(host);
+        configuration.setPort(port);
+        configuration.setUsername("default");
+        configuration.setPassword("ac62d873ee0a4a7eaac9592d6007a2a2");
+        return new LettuceConnectionFactory(configuration);
     }
 
     @Bean
@@ -71,7 +53,6 @@ public class CacheConfig {
                         RedisCacheConfiguration.defaultCacheConfig().serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer((new Jackson2JsonRedisSerializer<Car>(Car.class)))))
                 .build();
     }
-
     @Bean
     public ChannelTopic topic(){
         return new ChannelTopic("pubsub");
@@ -85,14 +66,14 @@ public class CacheConfig {
     @Bean
     public RedisMessageListenerContainer redisMessageListenerContainer(){
         RedisMessageListenerContainer container=new RedisMessageListenerContainer();
-        container.setConnectionFactory(redisConnectionFactory(redisConfiguration()));
+        container.setConnectionFactory(connectionFactory());
         container.addMessageListener(messageListenerAdapter(),topic());
         return container;
     }
     @Bean
     public RedisTemplate<String, Object> redisTemplate(){
         RedisTemplate<String, Object> template = new RedisTemplate<>();
-        template.setConnectionFactory(redisConnectionFactory(redisConfiguration()));
+        template.setConnectionFactory(connectionFactory());
         template.setKeySerializer(new JdkSerializationRedisSerializer());
         template.setValueSerializer(new GenericToStringSerializer<Object>(Object.class));
         return template;

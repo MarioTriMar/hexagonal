@@ -23,8 +23,7 @@ public class CustomerService implements ICustomerService {
     @Autowired
     private ICustomerRepository customerRepository;
 
-    @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
+
 
     @Override
     public void register(String name, String email, String pass1, String pass2, MultipartFile image) {
@@ -85,9 +84,7 @@ public class CustomerService implements ICustomerService {
 
     @Override
     public Customer getCustomerById(String id) {
-
         Customer customer = this.customerRepository.findById(id);
-        redisTemplate.opsForValue().set(customer.getId(), customer);
         return customer;
     }
 }

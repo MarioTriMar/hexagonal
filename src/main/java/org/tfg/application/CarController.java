@@ -15,13 +15,9 @@ public class CarController {
     @Autowired
     private ICarService carService;
 
-    @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
 
     @GetMapping("/getCarById/{id}")
     public Car getCarById(@PathVariable String id) throws JsonProcessingException {
-        String message="Hola/ "+id;
-        redisTemplate.convertAndSend("pubsub", message);
         return this.carService.findById(id);
     }
 

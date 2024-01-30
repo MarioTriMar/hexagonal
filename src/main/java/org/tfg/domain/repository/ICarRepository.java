@@ -4,5 +4,5 @@ import org.tfg.domain.model.Car;
 
 public interface ICarRepository {
     Car findById(String id);
-    void save(Car car);
+    Car save(Car car);
 }

@@ -25,7 +25,7 @@ public class CarRepository implements ICarRepository {
     }
 
     @Override
-    public void save(Car car) {
-        this.carRepository.save(new CarEntity(car));
+    public Car save(Car car) {
+        return this.carRepository.save(new CarEntity(car)).toCar();
     }
 }

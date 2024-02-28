@@ -43,4 +43,9 @@ public class CarController {
     public String funcion1(){
         return "funcion1";
     }
+
+    @GetMapping("car")
+    public String car(){
+        return "car";
+    }
 }

@@ -42,8 +42,4 @@ public class CustomerController {
         return this.customerService.getCustomerById(id);
     }
 
-    @GetMapping("customer")
-    public String customer(){
-        return "customer";
-    }
 }

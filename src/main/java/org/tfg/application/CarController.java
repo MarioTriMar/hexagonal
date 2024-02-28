@@ -35,8 +35,4 @@ public class CarController {
         return this.carService.save(name);
     }
 
-    @GetMapping("/funcion2")
-    public String funcion2(){
-        return "funcion2";
-    }
 }

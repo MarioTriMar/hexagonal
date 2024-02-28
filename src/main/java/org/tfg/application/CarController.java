@@ -39,4 +39,8 @@ public class CarController {
     public String funcion2(){
         return "funcion2";
     }
+    @GetMapping("/funcion1")
+    public String funcion1(){
+        return "funcion1";
+    }
 }

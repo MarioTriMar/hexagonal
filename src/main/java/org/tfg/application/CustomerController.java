@@ -41,4 +41,9 @@ public class CustomerController {
     public Customer getCustomerById(@PathVariable String id){
         return this.customerService.getCustomerById(id);
     }
+
+    @GetMapping("customer")
+    public String customer(){
+        return "customer";
+    }
 }

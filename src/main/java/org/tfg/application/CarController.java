@@ -34,5 +34,8 @@ public class CarController {
         this.logger.info("Evento enviado");
         return this.carService.save(name);
     }
-
+    @GetMapping("/funcion1")
+    public String funcion1(){
+        return "funcion1";
+    }
 }
